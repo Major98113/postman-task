@@ -10,11 +10,26 @@
     "@emotion/styled": "^11.6.0",
     "@material-ui/core": "^4.12.3",
     "@mui/material": "^5.4.0",
+    "amqplib": "^0.8.0",
+    "cors": "^2.8.5",
+    "inversify": "^5.0.1",
     "kafkajs": "^1.15.0",
     "next": "latest",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "reflect-metadata": "^0.1.13",
     "swr": "^0.1.18",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "winston": "^3.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.17.19",
+    "@types/amqplib": "^0.8.2",
+    "@types/react": "latest",
+    "@types/uuid": "^8.3.4",
+    "ts-node": "^8.10.2",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "typescript": "^3.9.10"
   }
 }

@@ -1,34 +1,46 @@
-version: "3.9"
+version: "3"
 services:
-  frontend:
+  postgres:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports: 
+      - '5432:5432'
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    environment:
+        - RABBITMQ_DEFAULT_USER=myuser
+        - RABBITMQ_DEFAULT_PASS=mypassword
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 30s
+      retries: 1
+  postman-service:
     build:
       context: ./postman-service
-    container_name: frontend-postman
-    ports:
-      - "3000:3000"
     environment:
-      - QUEUE=postman
-  zookeeper:
-    image: docker.io/bitnami/zookeeper:3.7
-    ports:
-      - "2181:2181"
-    volumes:
-      - "zookeeper_data:/bitnami"
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-  kafka:
-    image: docker.io/bitnami/kafka:3
-    ports:
-      - "9092:9092"
-    volumes:
-      - "kafka_data:/bitnami"
-    environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
+      APP_PORT: 8080
+      PG_DATABASE: postgres
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USERNAME: postgres
+      PG_PASSWORD: 1234
+      AMQP_URL: 'amqp://myuser:mypassword@rabbitmq:5672'
+      QUEUE: 'productsQueue'
+      START_TIMEOUT: 15000
+    restart: on-failure
     depends_on:
-      - zookeeper
+      - postgres
+      - rabbitmq
+    ports:
+      - '3000:3000'
 volumes:
-  zookeeper_data:
-    driver: local
-  kafka_data:
-    driver: local
+  db-data:
+    external: true

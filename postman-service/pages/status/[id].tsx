@@ -4,7 +4,7 @@ import { Grid } from "@mui/material";
 import { ProgressBar } from "../../components/ProgressBar";
 import { EMAIL_URL } from "../../libs/urls";
 
-const getStatus = async ( statusId ) => {
+const getStatus = async ( statusId: string ) => {
     const response = await fetch(`${EMAIL_URL}/${statusId}`, {
         method: 'GET',
         mode: 'cors',
@@ -19,7 +19,7 @@ const getStatus = async ( statusId ) => {
     return await response.json();
 }
 
-export default function Status() {
+const Status = () => {
     const router = useRouter();
     const {
         query: { id },
@@ -27,7 +27,7 @@ export default function Status() {
     const [progress, useProgress] = useState();
     const [error, useError] = useState();
     useEffect(() => {
-        if (id) {
+        if (id && typeof id === 'string') {
             getStatus(id)
                 .then( ({ data: { emailsCount } }) => useProgress(emailsCount) )
                 .catch( err => useError(err));
@@ -36,9 +36,6 @@ export default function Status() {
 
     if (error) return <div>Failed to load status</div>
     if (!progress) return <div>Loading...</div>
-
-    console.log("Progress: ", progress);
-    console.log("Error: ", error);
     
     return (
         <Grid
@@ -53,3 +50,5 @@ export default function Status() {
         </Grid> 
     )
 }
+
+export default Status;
