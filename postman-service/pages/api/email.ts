@@ -1,19 +1,34 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { v4 as uuidv4 } from 'uuid';
-import { RabbitMQ } from '../../loaders/rabbitmq';
+import { serviceContainer } from '../../config/inversify.config';
+import { QueueInterface, QUEUE } from '../../types/queue.types';
+import { LoggerInterface, Logger } from "../../types/logger.types";
+import { DB, DBInterface } from "../../types/db.types";
+import { EmailService } from '../../services/email.service';
+import { subscribeMailer } from '../../libs/mailer';
 
 const emailsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    if (req.method === 'POST') {
-        console.log("emailsHandler POST body:", JSON.stringify(req.body));
-        const messageBroker = new RabbitMQ();
-        const id = uuidv4();
-        const {data} = req.body; 
-        console.log("emailsHandler POST id:", id);
-        await messageBroker.connect();
-        await messageBroker.sendToQueue(JSON.stringify({id, emailsCount: Number(data)}));
-        await messageBroker.disconnect();
-        return res.status(200).json({id});
-    }
+  const loggerInstance = serviceContainer.get<LoggerInterface>(Logger);
+  const DBInstance = serviceContainer.get<DBInterface>(DB);
+  const QueueInstance = serviceContainer.get<QueueInterface>(QUEUE);
+
+  const EmailServiceInstance = new EmailService( serviceContainer.get<DBInterface>(DB) );
+  if (req.method === 'POST') {
+    loggerInstance.logServiceRequest(`emailsHandler POST body: ${JSON.stringify(req.body)}`);
+    const {data} = req.body; 
+
+    await DBInstance.connect();
+    await QueueInstance.connect();
+    const emailId = await EmailServiceInstance.createEmailsBatch(Number(data));
+    loggerInstance.logServiceRequest(`emailsHandler emailId: ${emailId}`);
+    await QueueInstance.sendToQueue(JSON.stringify({emailId, emailsCount: Number(data)}));
+    
+    subscribeMailer(emailId);
+    
+    await QueueInstance.disconnect();
+    await DBInstance.disconnect();
+
+    return res.status(200).json({emailId});
+  }
   }
 
 export default emailsHandler;

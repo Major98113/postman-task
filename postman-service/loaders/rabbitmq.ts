@@ -15,11 +15,17 @@ class RabbitMQ implements QueueInterface {
     private channel: Channel | undefined;
 
     constructor() {
-        // @ts-ignore
-        this.amqpUrl = process.env.AMQP_URL;
-        // @ts-ignore
-        this.queue = process.env.QUEUE;
         this.logger = serviceContainer.get<LoggerInterface>( Logger );
+        if (!process.env.AMQP_URL) {
+            this.logger.logError(`ENV.AMQP_URL is not defined`);
+            process.exit(1);
+        }
+        if (!process.env.QUEUE) {
+            this.logger.logError(`ENV.QUEUE is not defined`);
+            process.exit(1);
+        }
+        this.amqpUrl = process.env.AMQP_URL;
+        this.queue = process.env.QUEUE;
     }
 
     async connect() {

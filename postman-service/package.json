@@ -14,7 +14,9 @@
     "cors": "^2.8.5",
     "inversify": "^5.0.1",
     "kafkajs": "^1.15.0",
+    "mysql2": "^2.3.3",
     "next": "latest",
+    "pg": "^8.7.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "reflect-metadata": "^0.1.13",
@@ -30,6 +32,6 @@
     "ts-node": "^8.10.2",
     "eslint": "latest",
     "eslint-config-next": "latest",
-    "typescript": "^3.9.10"
+    "typescript": "latest"
   }
 }

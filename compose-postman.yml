@@ -1,14 +1,15 @@
 version: "3"
 services:
-  postgres:
-    image: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-    ports: 
-      - '5432:5432'
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: postman
+    ports:
+      - 3308:3306
+    volumes:
+      - db:/var/lib/mysql
   rabbitmq:
     image: rabbitmq:3.8-management-alpine
     environment:
@@ -26,21 +27,19 @@ services:
     build:
       context: ./postman-service
     environment:
-      APP_PORT: 8080
-      PG_DATABASE: postgres
-      PG_HOST: postgres
-      PG_PORT: 5432
-      PG_USERNAME: postgres
-      PG_PASSWORD: 1234
+      DB_NAME: postman
+      DB_HOST: mysqldb
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: 1234
       AMQP_URL: 'amqp://myuser:mypassword@rabbitmq:5672'
-      QUEUE: 'productsQueue'
+      QUEUE: 'emailQueue'
       START_TIMEOUT: 15000
     restart: on-failure
     depends_on:
-      - postgres
+      - mysqldb
       - rabbitmq
     ports:
       - '3000:3000'
-volumes:
-  db-data:
-    external: true
+volumes: 
+  db:
