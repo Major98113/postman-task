@@ -8,11 +8,11 @@ import { serviceContainer } from '../config/inversify.config';
 import { LoggerInterface, Logger } from '../types/logger.types';
 
 export enum Statuses {
-    PENDING,
-    SUCCESS
+    PENDING = 'PENDING',
+    SUCCESS = 'SUCCESS' 
 }
 
-interface IEmail {
+export interface IEmail {
     id: string;
     emailsCount: number;
     sentCount: number;
@@ -32,11 +32,14 @@ class EmailService{
 
     @log
     public async getEmailsBatchStatus( emailId: string): Promise<IEmail>{
-        const { rows: [ email ] } = await this.DB.query(
-            `SELECT FROM ${ this.table }
+        const response = await this.DB.query(
+            `SELECT * FROM ${ this.table }
                     WHERE id = ?`, 
                     [ emailId ]
         );
+        const [ rows ] = response;
+        const [email] = rows;
+        this.logger.logServiceRequest(`getEmailsBatchStatus email: ${JSON.stringify(email)}`);
         return email;
     }
 
@@ -56,20 +59,15 @@ class EmailService{
     }
 
     @log
-    public async updateEmailsBatchStatus( emailId: string, sentCount: number ): Promise<Statuses>{
-        const { rows: [ email ] }: { rows: IEmail[] } = await this.DB.query(
-            `SELECT FROM ${ this.table }
-                    WHERE id = ?`, 
-                    [ emailId ]
-        );
-        const newCountOfSentEmails = email.sentCount + sentCount;
-        const newStatus = email.emailsCount === newCountOfSentEmails ? Statuses.SUCCESS : Statuses.PENDING;
+    public async updateEmailsBatchStatus( emailId: string, sentCount: number, emailsCount: number ): Promise<Statuses>{
+        const newStatus = emailsCount <= sentCount ? Statuses.SUCCESS : Statuses.PENDING;
+        this.logger.logServiceRequest(`getEmailsBatchStatus sentCount: ${sentCount}`);
+        this.logger.logServiceRequest(`getEmailsBatchStatus newStatus: ${newStatus}`);
         await this.DB.query(
             `UPDATE ${ this.table }
-                SET sentCount = ?
-                    AND status = ?
+                SET sentCount = ?, status = ?
                         WHERE id = ?`, 
-                [ newCountOfSentEmails, newStatus , emailId ]
+                [ Number(sentCount), newStatus , emailId ]
         );
         return newStatus;
     }

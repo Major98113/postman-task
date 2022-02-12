@@ -11,7 +11,7 @@ const emailsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const DBInstance = serviceContainer.get<DBInterface>(DB);
   const QueueInstance = serviceContainer.get<QueueInterface>(QUEUE);
 
-  const EmailServiceInstance = new EmailService( serviceContainer.get<DBInterface>(DB) );
+  const EmailServiceInstance = new EmailService( DBInstance );
   if (req.method === 'POST') {
     loggerInstance.logServiceRequest(`emailsHandler POST body: ${JSON.stringify(req.body)}`);
     const {data} = req.body; 
