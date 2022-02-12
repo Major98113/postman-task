@@ -10,7 +10,10 @@
      docker-compose down --rmi all
 </code>
 <br/>
+<br/>
+<br/>
 <strong>IT WAS REPLACED KAFKA TO RabbitMQ BECAUSE THERE ARE SOME ISSUES WITH CONNECTING KAFKA TO NextJS app. I tried to replace it on RabbitMQ and it works correctly</strong>
+<br/><br/>
 <br/>
 <p>Also it is necessary to fill DB by data from next directory ( You can connect to DB after starting the App ):</p>
 <code>https://github.com/Major98113/postman-task/blob/main/postman-service/migrations/dump.sql</code>
