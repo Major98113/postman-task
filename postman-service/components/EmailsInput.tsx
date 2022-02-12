@@ -25,8 +25,8 @@ export const EmailsInput = () => {
     const sendEmails = async () => {
         if (isNumeric(text) && isValueCorrectLimits(text)) {
             const response = await submitEmails(text);
-            const { id } = response;
-            return window.location.replace(`${STATUS_URL}/${id}`);
+            const { emailId } = response;
+            return window.location.replace(`${STATUS_URL}/${emailId}`);
         }
         alert("Incorrect value");
     };

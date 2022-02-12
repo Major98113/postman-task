@@ -1,20 +1,14 @@
 import { Grid, Box, Typography } from "@mui/material";
-import LinearProgress from '@mui/material/LinearProgress';
 
-const LinearProgressWithLabel = (props: any) => (
+const LinearProgressWithLabel = ({emailsCount, sentCount}) => (
   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    <Box sx={{ width: '100%', mr: 1 }}>
-      <LinearProgress variant="determinate" value={props.value} />
-    </Box>
     <Box sx={{ minWidth: 35 }}>
-      <Typography variant="body2" color="text.secondary">{`${Math.round(
-        props.value,
-      )}%`}</Typography>
+      <Typography variant="body2" color="text.secondary">{sentCount}/{emailsCount}</Typography>
     </Box>
   </Box>
 );
 
-export const ProgressBar = ({ progress}) => (
+export const ProgressBar = ({emailsCount, sentCount, status}) => (
   <Grid
     container
     spacing={10}
@@ -23,7 +17,10 @@ export const ProgressBar = ({ progress}) => (
     justifyContent="center"
     style={{ minHeight: '100vh' }}
   >
-      <h1>Progress</h1>
-      <LinearProgressWithLabel value={progress} />
+      <h1>Progress ({status})</h1>
+      <LinearProgressWithLabel
+        emailsCount={emailsCount}
+        sentCount={sentCount}
+      />
   </Grid>
 );

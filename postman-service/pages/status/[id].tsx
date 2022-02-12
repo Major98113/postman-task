@@ -29,13 +29,14 @@ const Status = () => {
     useEffect(() => {
         if (id && typeof id === 'string') {
             getStatus(id)
-                .then( ({ data: { emailsCount } }) => useProgress(emailsCount) )
+                .then( ({ data }) => useProgress(data) )
                 .catch( err => useError(err));
         }
     }, [id]);
 
     if (error) return <div>Failed to load status</div>
     if (!progress) return <div>Loading...</div>
+    const {emailsCount, sentCount, status} = progress;
     
     return (
         <Grid
@@ -46,7 +47,11 @@ const Status = () => {
             justifyContent="center"
             style={{ minHeight: '100vh' }}
             >
-            <ProgressBar progress={progress}/>
+            <ProgressBar
+                emailsCount={emailsCount}
+                sentCount={sentCount}
+                status={status}
+            />
         </Grid> 
     )
 }
